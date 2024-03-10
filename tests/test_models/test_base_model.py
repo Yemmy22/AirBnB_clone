@@ -32,6 +32,9 @@ class test_BaseModel(unittest.TestCase):
         my_model_json = my_model.to_dict()
         self.dict = my_model_json
 
+        my_new_model = BaseModel(**my_model_json)
+        self.obj_1 = my_new_model
+
     def test_instance(self):
         '''
         Test that the object is an instance of BaseModel.
@@ -78,3 +81,24 @@ class test_BaseModel(unittest.TestCase):
         '''
         self.assertIn("__class__", self.dict)
         self.assertIsInstance(self.dict, dict)
+
+    def test_obj_1_not_obj(self):
+        '''
+        Test that obj_1 is not obj.
+        '''
+        self.assertIsNot(self.obj_1, self.obj)
+
+    def test_class_not_attr(self):
+        '''
+        Test that "__clas__" is not an attribute of obj_1
+        '''
+        self.assertNotIn("__class__", self.obj_1.__dict__)
+
+    def test_attr_is_key_value(self):
+        '''
+        Test that keys in obj dict are attributes of obj_1.
+        '''
+        for key, value in self.dict.items():
+            if key != "__class__":
+                with self.subTest(key=key):
+                    self.assertIn(key, self.obj_1.__dict__)
