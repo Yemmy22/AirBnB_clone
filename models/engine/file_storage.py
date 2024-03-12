@@ -19,7 +19,6 @@ class FileStorage():
         '''
         Returns all deserialized objects in a dict.
         '''
-        p = self.__objects
         return self.__objects
 
     def new(self, obj):
