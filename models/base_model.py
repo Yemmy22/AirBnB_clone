@@ -5,6 +5,7 @@ A BaseModel Module.
 
 from datetime import datetime
 import uuid
+from models.__init__ import storage
 
 
 class BaseModel():
@@ -27,21 +28,25 @@ class BaseModel():
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
-            self.updated_at = datetime.now()
+            self.updated_at = self.created_at
+            storage.new(self)
 
     def __str__(self):
         '''
         Modifies and return the string representation of the
         BaseModel object.
         '''
-        ret = "[{}] ({}) {}".format(__class__.__name__, self.id, self.__dict__)
-        return ret
+        return "[{}] ({}) {}".\
+            format(self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
         '''
-        Updates the update_at attribute of the object.
+        Updates the update_at attribute of the object
+        and saves the object to a file.
         '''
         self.updated_at = datetime.now()
+        storage.new(self)
+        storage.save()
 
     def to_dict(self):
         '''
