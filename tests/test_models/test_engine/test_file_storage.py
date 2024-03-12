@@ -71,7 +71,7 @@ class test_FileStorage(unittest.TestCase):
         same BaseModel object.
         '''
         self.assertTrue(hasattr(FileStorage, "reload"))
-        self.bm_obj.name = "same" 
+        self.bm_obj.name = "same"
         self.bm_obj.save()
         self.storage.reload()
         for obj in self.storage.all().values():
