@@ -7,9 +7,10 @@ A BaseModel Test Module.
 import unittest
 from models.base_model import BaseModel
 import uuid
+'''from models.engine.file_storage import Filestorage'''
 
 
-class test_BaseModel(unittest.TestCase):
+class test_BaseModel_FileStorage(unittest.TestCase):
     '''
     Subclass of unittest.Testcases. Performs unittest on
     all instances of BaseModel class.
@@ -25,15 +26,16 @@ class test_BaseModel(unittest.TestCase):
 
         self.obj_str = self.obj.__str__()
         self.time_0 = self.obj.updated_at
-
+        '''
         my_model.save()
         self.time_1 = self.obj.updated_at
-
+        
         my_model_json = my_model.to_dict()
         self.dict = my_model_json
 
         my_new_model = BaseModel(**my_model_json)
         self.obj_1 = my_new_model
+        '''
 
     def test_instance(self):
         '''
@@ -72,6 +74,8 @@ class test_BaseModel(unittest.TestCase):
         Test that the method updates the update_at attribute's
         timestamp
         '''
+        self.obj.save()
+        self.time_1 = self.obj.updated_at
         self.assertGreater(self.time_1, self.time_0)
 
     def test_to_dict(self):
@@ -79,6 +83,7 @@ class test_BaseModel(unittest.TestCase):
         Test that the method contains a keyword "__class__"
         and returns a dictionary.
         '''
+        self.dict = self.obj.to_dict()
         self.assertIn("__class__", self.dict)
         self.assertIsInstance(self.dict, dict)
 
@@ -86,19 +91,26 @@ class test_BaseModel(unittest.TestCase):
         '''
         Test that obj_1 is not obj.
         '''
-        self.assertIsNot(self.obj_1, self.obj)
+        obj_dict = self.obj.to_dict()
+        new_obj = BaseModel(**obj_dict)
+        self.obj_new = new_obj
+        self.assertIsNot(self.obj_new, self.obj)
 
     def test_class_not_attr(self):
         '''
-        Test that "__clas__" is not an attribute of obj_1
+        Test that "__class__" is not an attribute of obj_1
         '''
-        self.assertNotIn("__class__", self.obj_1.__dict__)
+        self.dict = self.obj.to_dict()
+        self.new_obj = BaseModel(**self.dict)
+        self.assertNotIn("__class__", self.new_obj.__dict__)
 
     def test_attr_is_key_value(self):
         '''
         Test that keys in obj dict are attributes of obj_1.
         '''
+        self.dict = self.obj.to_dict()
+        self.obj_1 = BaseModel(**self.dict)
         for key, value in self.dict.items():
             if key != "__class__":
                 with self.subTest(key=key):
-                    self.assertIn(key, self.obj_1.__dict__)
+                    self.assertIn(key, self.obj_1.__dict__)               

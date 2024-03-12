@@ -34,11 +34,12 @@ class FileStorage():
         Replace objects in __objects with the return value of
         to_dict method and serializes __objects in a file.
         '''
+        serialized_objects = {}
         for key, value in self.__objects.items():
-            self.__objects[key] = value.to_dict()
+            serialized_objects[key] = value.to_dict()
 
         with open(self.__file_path, 'w', encoding="utf-8") as f:
-            json.dump(self.__objects, f)
+            json.dump(serialized_objects, f)
 
     def reload(self):
         '''
