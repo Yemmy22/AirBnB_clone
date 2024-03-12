@@ -7,7 +7,6 @@ A BaseModel Test Module.
 import unittest
 from models.base_model import BaseModel
 import uuid
-'''from models.engine.file_storage import Filestorage'''
 
 
 class test_BaseModel_FileStorage(unittest.TestCase):
@@ -26,22 +25,19 @@ class test_BaseModel_FileStorage(unittest.TestCase):
 
         self.obj_str = self.obj.__str__()
         self.time_0 = self.obj.updated_at
-        '''
-        my_model.save()
-        self.time_1 = self.obj.updated_at
-        
-        my_model_json = my_model.to_dict()
-        self.dict = my_model_json
-
-        my_new_model = BaseModel(**my_model_json)
-        self.obj_1 = my_new_model
-        '''
 
     def test_instance(self):
         '''
         Test that the object is an instance of BaseModel.
         '''
         self.assertIsInstance(self.obj, BaseModel)
+        name = "base1"
+        arg = name
+        kwargs = {"name": "base2"}
+
+        self.obj = BaseModel(*arg, **kwargs)
+        self.assertNotEqual(self.obj.name, "base1")
+        self.assertEqual(self.obj.name, "base2")
 
     def test_id(self):
         '''
@@ -113,4 +109,4 @@ class test_BaseModel_FileStorage(unittest.TestCase):
         for key, value in self.dict.items():
             if key != "__class__":
                 with self.subTest(key=key):
-                    self.assertIn(key, self.obj_1.__dict__)               
+                    self.assertIn(key, self.obj_1.__dict__)
