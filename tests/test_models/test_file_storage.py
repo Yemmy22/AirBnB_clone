@@ -57,23 +57,23 @@ class test_FileStorage(unittest.TestCase):
 
     def test_save(self):
         '''
-        Test "save()" methods of FileStorage and BaseModel classes.
+        Tests "save()" methods of FileStorage and BaseModel classes.
         '''
         self.assertTrue(hasattr(FileStorage, "save"))
+        self.assertIsNotNone(self.bm_obj.created_at)
         self.bm_obj.save()
+        self.storage.reload()
         self.assertIsNotNone(self.bm_obj.created_at)
 
     def test_reload(self):
         '''
-        Test "reload()" method of FileStorage reloads the
+        Tests "reload()" method of FileStorage reloads the
         same BaseModel object.
         '''
         self.assertTrue(hasattr(FileStorage, "reload"))
-        self.bm_obj.name = "same"
-        self.obj_id = self.bm_obj.id
+        self.bm_obj.name = "same" 
         self.bm_obj.save()
         self.storage.reload()
-        self.all_objs = self.storage.all().values()
-        for obj in self.all_objs:
+        for obj in self.storage.all().values():
             if obj == self.bm_obj:
                 self.assertEqual(obj.name, "same")
