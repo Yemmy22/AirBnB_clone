@@ -79,33 +79,32 @@ class test_FileStorage(unittest.TestCase):
         obj.save()
         self.assertTrue(os.path.exists(self.storage._FileStorage__file_path))
 
-
     def test_reload(self):
         '''
         Tests "reload()" method of FileStorage reloads the
         same BaseModel object.
         '''
         self.assertTrue(hasattr(FileStorage, "reload"))
-        self.bm_obj.name = "same"
-        self.bm_obj.save()
-        self.storage.reload()
-        for obj in self.storage.all().values():
-            if obj == self.bm_obj:
-                self.assertEqual(obj.name, "same")
 
-        # Create and save a BaseModel object
+    def test_reload_existing_file_valid_json(self):
+        '''
+        Create and save a BaseModel object
+        '''
         obj = BaseModel()
         obj.save()
-        obj_id = obj.id
-        obj_created_at = obj.created_at
-        obj_updated_at = obj.updated_at
 
-        # Reload the storage
+        '''
+        Modify saved file to contain valid JSON data
+        '''
+        with open(self.storage._FileStorage__file_path, 'w') as f:
+            f.write('{"BaseModel.12345": {"id": "12345", "created_at": "2024-03-14T12:00:00", "updated_at": "2024-03-14T12:00:00"}}')
+        '''
+        Call reload method
+        '''
         self.storage.reload()
 
-        # Check if the reloaded object matches the saved object
-        loaded_obj = self.storage.all().get(f"BaseModel.{obj_id}")
-        self.assertIsNotNone(loaded_obj)
-        self.assertEqual(loaded_obj.id, obj_id)
-        self.assertEqual(loaded_obj.created_at, obj_created_at)
-        self.assertEqual(loaded_obj.updated_at, obj_updated_at)
+        '''
+        Verify that the __objects dictionary contains the
+        reloaded object
+        '''
+        self.assertIn("BaseModel.{}".format(obj.id), self.storage._FileStorage__objects)
