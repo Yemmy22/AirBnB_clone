@@ -95,5 +95,12 @@ class test_FileStorage(unittest.TestCase):
 
         obj = BaseModel()
         obj.save()
+        obj_id = obj.id
+        obj.created_at = obj.created_at
+        obj.updated_at = obj.created_at
         self.storage.reload()
-        self.assertTrue(self.storage.all())
+        loaded_obj = self.storage.all()[f"BaseModel.{obj_id}"]
+        self.assertEqual(loaded_obj.id, obj_id)
+        self.assertEqual(loaded_obj.created_at, obj.created_at)
+        self.assertIsNotNone(loaded_obj.created_at, obj.created_at)
+        self.assertIsNotNone(loaded_obj.updated_at, obj.updated_at)
