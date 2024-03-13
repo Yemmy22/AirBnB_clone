@@ -93,13 +93,19 @@ class test_FileStorage(unittest.TestCase):
             if obj == self.bm_obj:
                 self.assertEqual(obj.name, "same")
 
+        # Create and save a BaseModel object
         obj = BaseModel()
         obj.save()
         obj_id = obj.id
         obj_created_at = obj.created_at
         obj_updated_at = obj.updated_at
+
+        # Reload the storage
         self.storage.reload()
-        loaded_obj = self.storage.all()[f"BaseModel.{obj_id}"]
+
+        # Check if the reloaded object matches the saved object
+        loaded_obj = self.storage.all().get(f"BaseModel.{obj_id}")
+        self.assertIsNotNone(loaded_obj)
         self.assertEqual(loaded_obj.id, obj_id)
         self.assertEqual(loaded_obj.created_at, obj_created_at)
         self.assertEqual(loaded_obj.updated_at, obj_updated_at)

@@ -76,7 +76,13 @@ class test_BaseModel_FileStorage(unittest.TestCase):
 
         initial_updated_at = self.obj.updated_at
         self.obj.save()
+
         self.assertNotEqual(initial_updated_at, self.obj.updated_at)
+
+        loaded_obj = BaseModel(**self.obj.to_dict())
+        self.assertEqual(self.obj.id, loaded_obj.id)
+        self.assertEqual(self.obj.created_at, loaded_obj.created_at)
+        self.assertEqual(self.obj.updated_at, loaded_obj.updated_at)
 
     def test_to_dict(self):
         '''
