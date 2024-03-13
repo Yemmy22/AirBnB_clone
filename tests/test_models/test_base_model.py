@@ -74,7 +74,6 @@ class test_BaseModel_FileStorage(unittest.TestCase):
         self.time_1 = self.obj.updated_at
         self.assertGreater(self.time_1, self.time_0)
 
-        self.obj = BaseModel()
         initial_updated_at = self.obj.updated_at
         self.obj.save()
         self.assertNotEqual(initial_updated_at, self.obj.updated_at)
