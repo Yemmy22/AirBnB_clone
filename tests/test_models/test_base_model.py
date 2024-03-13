@@ -74,6 +74,11 @@ class test_BaseModel_FileStorage(unittest.TestCase):
         self.time_1 = self.obj.updated_at
         self.assertGreater(self.time_1, self.time_0)
 
+        self.obj = BaseModel()
+        initial_updated_at = self.obj.updated_at
+        self.obj.save()
+        self.assertNotEqual(initial_updated_at, self.obj.updated_at)
+
     def test_to_dict(self):
         '''
         Test that the method contains a keyword "__class__"

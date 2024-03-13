@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import unittest
 from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
@@ -16,6 +17,13 @@ class test_FileStorage(unittest.TestCase):
         '''
         self.storage = FileStorage()
         self.bm_obj = BaseModel()
+
+    def tearDown(self):
+        '''
+        Cleans up the environment.
+        '''
+        if os.path.exists(self.storage._FileStorage__file_path):
+            os.remove(self.storage._FileStorage__file_path)
 
     def test_storage(self):
         '''
@@ -67,6 +75,11 @@ class test_FileStorage(unittest.TestCase):
         self.bm_obj.save()
         self.assertIsNotNone(self.bm_obj.created_at)
 
+        obj = BaseModel()
+        obj.save()
+        self.assertTrue(os.path.exists(self.storage._FileStorage__file_path))
+
+
     def test_reload(self):
         '''
         Tests "reload()" method of FileStorage reloads the
@@ -79,3 +92,8 @@ class test_FileStorage(unittest.TestCase):
         for obj in self.storage.all().values():
             if obj == self.bm_obj:
                 self.assertEqual(obj.name, "same")
+
+        obj = BaseModel()
+        obj.save()
+        self.storage.reload()
+        self.assertTrue(self.storage.all())
