@@ -46,6 +46,7 @@ class test_FileStorage(unittest.TestCase):
         value.
         '''
         self.assertTrue(hasattr(FileStorage, "all"))
+        self.assertIs(self.storage.all(), self.storage._FileStorage__objects)
 
     def test_new(self):
         '''
@@ -54,6 +55,8 @@ class test_FileStorage(unittest.TestCase):
         '''
         self.assertTrue(hasattr(FileStorage, "new"))
         self.assertIn(self.bm_obj, self.storage._FileStorage__objects.values())
+        self.storage.new(self.bm_obj)
+        self.assertIn(self.bm_obj, self.storage.all().values())
 
     def test_save(self):
         '''
@@ -62,7 +65,6 @@ class test_FileStorage(unittest.TestCase):
         self.assertTrue(hasattr(FileStorage, "save"))
         self.assertIsNotNone(self.bm_obj.created_at)
         self.bm_obj.save()
-        self.storage.reload()
         self.assertIsNotNone(self.bm_obj.created_at)
 
     def test_reload(self):
