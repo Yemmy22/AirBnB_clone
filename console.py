@@ -10,7 +10,7 @@ class HBNBCommand(cmd.Cmd):
     '''
     A subclass of the Cmd class with defined commands.
     '''
-    
+
     prompt = '(hbnb) '
 
     def do_EOF(self, line):
