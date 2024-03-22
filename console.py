@@ -127,6 +127,8 @@ class HBNBCommand(cmd.Cmd):
                                 attr_value = arg[3].strip('"').strip("'")
                                 setattr(obj, attr, attr_type(attr_value))
                                 obj.save()
+                                return
+                        print("** no instance found **")
         else:
             print("** class name missing **")
 
