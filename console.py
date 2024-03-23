@@ -5,6 +5,7 @@ HBNB class module.
 
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models.__init__ import storage
 
 
@@ -14,7 +15,7 @@ class HBNBCommand(cmd.Cmd):
     '''
 
     prompt = '(hbnb) '
-    class_list = ["BaseModel"]
+    class_list = ["BaseModel", "User", "Fake"]
 
     def do_EOF(self, line):
         return True
@@ -54,9 +55,11 @@ class HBNBCommand(cmd.Cmd):
                     if len(args) == 1:
                         print("** instance id missing **")
                     else:
-                        for obj in storage.all().values():
-                            if args[1] == obj.id:
-                                print(obj)
+                        all_obj = storage.all()
+                        for obj_key in all_obj:
+                            key = "{}.{}".format(args[0], args[1])
+                            if key == obj_key:
+                                print(all_obj[obj_key])
                                 return
                         print("** no instance found **")
         else:
@@ -73,9 +76,12 @@ class HBNBCommand(cmd.Cmd):
                     if len(args) == 1:
                         print("** instance id missing **")
                     else:
-                        for key, obj in storage.all().items():
-                            if obj.id == args[1]:
-                                del(storage.all()[key])
+                        all_obj = storage.all()
+
+                        for obj_key, obj in storage.all().items():
+                            key = "{}.{}".format(args[0], args[1])
+                            if key == obj_key:
+                                del(all_obj[key])
                                 storage.save()
                                 return
                         print("** no instance found **")
@@ -120,8 +126,11 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     const_attr = ["id", "created_at", "updated_at"]
                     if arg[2] not in const_attr:
-                        for obj in storage.all().values():
-                            if arg[1] == obj.id:
+
+                        all_obj = storage.all()
+                        for obj_key, obj in all_obj.items():
+                            key = "{}.{}".format(arg[0], arg[1])
+                            if key == obj_key:
                                 attr = arg[2]
                                 attr_type = type(arg[2])
                                 attr_value = arg[3].strip('"').strip("'")

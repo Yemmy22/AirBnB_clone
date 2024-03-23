@@ -51,8 +51,10 @@ class FileStorage():
             with open(self.__file_path, 'r', encoding="utf-8") as f:
                 try:
                     saved_dict = json.load(f)
-                    from models.base_model import BaseModel
                     for name, obj_dict in saved_dict.items():
-                        self.__objects[name] = BaseModel(**obj_dict)
+                        from models.base_model import BaseModel
+                        from models.user import User
+                        class_name, i_d = name.split('.')
+                        self.__objects[name] = eval(class_name)(**obj_dict)
                 except Exception:
                     pass
