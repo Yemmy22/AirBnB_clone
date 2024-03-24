@@ -97,7 +97,9 @@ class test_FileStorage(unittest.TestCase):
         Modify saved file to contain valid JSON data
         '''
         with open(self.storage._FileStorage__file_path, 'w') as f:
-            f.write('{"BaseModel.12345": {"id": "12345", "created_at": "2024-03-14T12:00:00", "updated_at": "2024-03-14T12:00:00"}}')
+            f.write('{"BaseModel.12345": {"id": "12345",\
+                "created_at": "2024-03-14T12:00:00",\
+            "updated_at": "2024-03-14T12:00:00"}}')
         '''
         Call reload method
         '''
@@ -107,4 +109,5 @@ class test_FileStorage(unittest.TestCase):
         Verify that the __objects dictionary contains the
         reloaded object
         '''
-        self.assertIn("BaseModel.{}".format(obj.id), self.storage._FileStorage__objects)
+        self.assertIn
+        ("BaseModel.{}".format(obj.id), self.storage._FileStorage__objects)
