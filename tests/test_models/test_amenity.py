@@ -1,25 +1,25 @@
 #!/usr/bin/python3
 '''
-A User Test Module.
+An Amenity Test Module.
 '''
 
 
 import unittest
 from models.base_model import BaseModel
-from models.user import User
+from models.amenity import Amenity
 import uuid
 
 
-class test_User_FileStorage(unittest.TestCase):
+class test_Amenity_FileStorage(unittest.TestCase):
     '''
     Subclass of unittest.Testcases. Performs unittest on
-    all instances of User class.
+    all instances of Amenity class.
     '''
     def setUp(self):
         '''
         Defines the test attributes.
         '''
-        my_model = User()
+        my_model = Amenity()
         my_model.name = "My First Model"
         my_model.my_number = 89
         self.obj = my_model
@@ -29,20 +29,20 @@ class test_User_FileStorage(unittest.TestCase):
 
     def test_issubclass(self):
         '''
-        Tests that User is a subclass of User.
+        Tests that Amenity is a subclass of BaseModel.
         '''
-        self.assertTrue(User, BaseModel)
+        self.assertTrue(Amenity, BaseModel)
 
     def test_instance(self):
         '''
-        Test that the object is an instance of User.
+        Test that the object is an instance of Amenity.
         '''
-        self.assertIsInstance(self.obj, User)
+        self.assertIsInstance(self.obj, Amenity)
         name = "base1"
         arg = name
         kwargs = {"name": "base2"}
 
-        self.obj1 = User(*arg, **kwargs)
+        self.obj1 = Amenity(*arg, **kwargs)
         self.assertNotEqual(self.obj1.name, "base1")
         self.assertEqual(self.obj1.name, "base2")
 
@@ -64,51 +64,19 @@ class test_User_FileStorage(unittest.TestCase):
         '''
         self.assertTrue(hasattr(self.obj, "updated_at"))
 
-    def test_email(self):
+    def test_name(self):
         '''
-        Test that email is an attribute of the User.
+        Test that name is an attribute of the class and object.
         '''
-        self.assertTrue(hasattr(self.obj, "email"))
-        self.assertTrue(isinstance(self.obj.email, str))
-
-        self.obj.email = "email@email"
-        self.assertEqual(self.obj.email, "email@email")
-
-    def test_password(self):
-        '''
-        Test that password is an attribute of the User.
-        '''
-        self.assertTrue(hasattr(self.obj, "password"))
-        self.assertTrue(isinstance(self.obj.password, str))
-
-        self.obj.password = "pass_me123"
-        self.assertEqual(self.obj.password, "pass_me123")
-
-    def test_first_name(self):
-        '''
-        Test that first_name is an attribute of the User.
-        '''
-        self.assertTrue(hasattr(self.obj, "first_name"))
-        self.assertTrue(isinstance(self.obj.first_name, str))
-
-        self.obj.first_name = "firstname"
-        self.assertEqual(self.obj.first_name, "firstname")
-
-    def test_last_name(self):
-        '''
-        Test that last_name is an attribute of the User.
-        '''
-        self.assertTrue(hasattr(self.obj, "last_name"))
-        self.assertTrue(isinstance(self.obj.last_name, str))
-
-        self.obj.last_name = "lastname"
-        self.assertEqual(self.obj.last_name, "lastname")
+        self.assertTrue(hasattr(Amenity, "name"))
+        self.assertTrue(hasattr(self.obj, "name"))
+        self.assertIs(type(Amenity.name), str)
 
     def test_str(self):
         '''
         Test that the method returns a string object.
         '''
-        expected_str = "[User] ({}) {}"\
+        expected_str = "[Amenity] ({}) {}"\
             .format(self.obj.id, self.obj.__dict__)
         self.assertEqual(str(self.obj), expected_str)
 
@@ -126,7 +94,7 @@ class test_User_FileStorage(unittest.TestCase):
 
         self.assertNotEqual(initial_updated_at, self.obj.updated_at)
 
-        loaded_obj = User(**self.obj.to_dict())
+        loaded_obj = Amenity(**self.obj.to_dict())
         self.assertEqual(self.obj.id, loaded_obj.id)
         self.assertEqual(self.obj.created_at, loaded_obj.created_at)
         self.assertEqual(self.obj.updated_at, loaded_obj.updated_at)
@@ -145,7 +113,7 @@ class test_User_FileStorage(unittest.TestCase):
         Test that obj_1 is not obj.
         '''
         obj_dict = self.obj.to_dict()
-        new_obj = User(**obj_dict)
+        new_obj = Amenity(**obj_dict)
         self.obj_new = new_obj
         self.assertIsNot(self.obj_new, self.obj)
 
@@ -154,7 +122,7 @@ class test_User_FileStorage(unittest.TestCase):
         Test that "__class__" is not an attribute of obj_1
         '''
         self.dict = self.obj.to_dict()
-        self.new_obj = User(**self.dict)
+        self.new_obj = Amenity(**self.dict)
         self.assertNotIn("__class__", self.new_obj.__dict__)
 
     def test_attr_is_key_value(self):
@@ -162,7 +130,7 @@ class test_User_FileStorage(unittest.TestCase):
         Test that keys in obj dict are attributes of obj_1.
         '''
         self.dict = self.obj.to_dict()
-        self.obj_1 = User(**self.dict)
+        self.obj_1 = Amenity(**self.dict)
         for key, value in self.dict.items():
             if key != "__class__":
                 with self.subTest(key=key):
