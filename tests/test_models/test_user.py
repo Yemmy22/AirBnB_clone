@@ -64,6 +64,46 @@ class test_User_FileStorage(unittest.TestCase):
         '''
         self.assertTrue(hasattr(self.obj, "updated_at"))
 
+    def test_email(self):
+        '''
+        Test that email is an attribute of the User.
+        '''
+        self.assertTrue(hasattr(self.obj, "email"))
+        self.assertTrue(isinstance(self.obj.email, str))
+
+        self.obj.email = "email@email"
+        self.assertEqual(self.obj.email, "email@email")
+
+    def test_password(self):
+        '''
+        Test that password is an attribute of the User.
+        '''
+        self.assertTrue(hasattr(self.obj, "password"))
+        self.assertTrue(isinstance(self.obj.password, str))
+
+        self.obj.password = "pass_me123"
+        self.assertEqual(self.obj.password, "pass_me123")
+
+    def test_first_name(self):
+        '''
+        Test that first_name is an attribute of the User.
+        '''
+        self.assertTrue(hasattr(self.obj, "first_name"))
+        self.assertTrue(isinstance(self.obj.first_name, str))
+
+        self.obj.first_name = "firstname"
+        self.assertEqual(self.obj.first_name, "firstname")
+
+    def test_last_name(self):
+        '''
+        Test that last_name is an attribute of the User.
+        '''
+        self.assertTrue(hasattr(self.obj, "last_name"))
+        self.assertTrue(isinstance(self.obj.last_name, str))
+
+        self.obj.last_name = "lastname"
+        self.assertEqual(self.obj.last_name, "lastname")
+
     def test_str(self):
         '''
         Test that the method returns a string object.
