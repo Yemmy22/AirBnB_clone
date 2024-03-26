@@ -93,7 +93,7 @@ class HBNBCommand(cmd.Cmd):
                         key = "{}.{}".\
                             format(args[0], args[1])
                         if key == obj_key:
-                            del(all_obj[key])
+                            del (all_obj[key])
                             storage.save()
                             return
                     print("** no instance found **")
@@ -156,6 +156,12 @@ class HBNBCommand(cmd.Cmd):
                                     print("** no instance found **")
         else:
             print("** class name missing **")
+
+    def onecmd(self, line):
+        arg = line.split('.')
+        if arg[0] in self.class_list and arg[1] == "all()":
+            line = "all " + arg[0]
+        return cmd.Cmd.onecmd(self, line)
 
 
 if __name__ == '__main__':
