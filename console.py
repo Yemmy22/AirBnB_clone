@@ -157,10 +157,28 @@ class HBNBCommand(cmd.Cmd):
         else:
             print("** class name missing **")
 
+    def default(self, line):
+        '''
+        Mutes the error feedback.
+        '''
+        pass
+
     def onecmd(self, line):
+        '''
+        Processes Non-commands.
+        '''
         arg = line.split('.')
         if arg[0] in self.class_list and arg[1] == "all()":
             line = "all " + arg[0]
+
+        if arg[0] in self.class_list and arg[1] == "count()":
+            print(arg[0], arg[1])
+            count = 0
+            for key in storage.all():
+                obj_name, obj_id = key.split('.')
+                if obj_name == arg[0]:
+                    count += 1
+            print(count)
         return cmd.Cmd.onecmd(self, line)
 
 
