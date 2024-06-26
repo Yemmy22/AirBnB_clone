@@ -20,8 +20,15 @@ class HBNBCommand(cmd.Cmd):
     '''
 
     prompt = '(hbnb) '
-    class_list = \
-        ["BaseModel", "User", "State", "City", "Place", "Amenity", "Review"]
+    class_list = [
+            "BaseModel",
+            "User",
+            "State",
+            "City",
+            "Place",
+            "Amenity",
+            "Review"
+            ]
 
     def do_EOF(self, line):
         return True
@@ -168,17 +175,49 @@ class HBNBCommand(cmd.Cmd):
         Processes Non-commands.
         '''
         arg = line.split('.')
-        if arg[0] in self.class_list and arg[1] == "all()":
-            line = "all " + arg[0]
 
-        if arg[0] in self.class_list and arg[1] == "count()":
-            print(arg[0], arg[1])
-            count = 0
-            for key in storage.all():
-                obj_name, obj_id = key.split('.')
-                if obj_name == arg[0]:
-                    count += 1
-            print(count)
+        try:
+            cmnd, data = arg[1].split('(')
+            obj_id = data[:-1]
+            obj_id = obj_id.strip('"')
+
+            '''
+            Usage: <class name>.show(<id>)
+            Print all existing instances of the specified class
+            '''
+
+            if arg[0] in self.class_list and cmnd == "show":
+                line = "show {} {}".format(arg[0], obj_id)
+        except Exception:
+            pass
+            '''
+            Alternative code for <class name>.show(<id>):
+            elif arg[1].startswith("show("):
+            instance_id = arg[1][5:-1].strip('"')
+            line = f"show {arg[0]} {instance_id}"
+            '''
+
+        if len(arg) == 2:
+            '''
+            Usage: <class name>.all()
+            Print all existing instances.
+            '''
+            if arg[0] in self.class_list and arg[1] == "all()":
+                line = "all " + arg[0]
+
+            '''
+            Usage: <class name>.count()
+            Print the total number of specified class
+            '''
+
+            if arg[0] in self.class_list and arg[1] == "count()":
+                print(arg[0], arg[1])
+                count = 0
+                for key in storage.all():
+                    obj_name, obj_id = key.split('.')
+                    if obj_name == arg[0]:
+                        count += 1
+                print(count)
         return cmd.Cmd.onecmd(self, line)
 
 
