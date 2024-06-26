@@ -127,6 +127,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, line):
         """
+        Usage: update <class name> <id> <attribute name> <attribute value>
         Update an instance attribute
         """
         if line:
@@ -194,6 +195,20 @@ class HBNBCommand(cmd.Cmd):
             elif arg[0] in self.class_list and cmnd == "destroy":
                 line = "destroy {} {}".format(arg[0], obj_id)
 
+            # <class name>.update(<id>, <attribute name>, <attribute value>)
+            # Update a specified class instance.
+
+            elif arg[0] in self.class_list and cmnd == "update":
+                data_1, data_2, data_3 = data.split()
+                obj_id = data_1.strip(',').strip('"')
+                attr_name = data_2.strip(',').strip('"')
+                attr_value = data_3.strip(')')
+                line = "update {} {} {} {}".format(
+                        arg[0],
+                        obj_id,
+                        attr_name,
+                        attr_value
+                        )
         except Exception:
             pass
 
