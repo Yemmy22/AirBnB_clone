@@ -134,32 +134,27 @@ class HBNBCommand(cmd.Cmd):
             arg = line.split(' ')
             if arg[0] not in self.class_list:
                 print("** class doesn't exist **")
-                return
-            if len(arg) < 2:
+            elif len(arg) < 2:
                 print("** instance id missing **")
-                return
-            if len(arg) < 3:
+            elif len(arg) < 3:
                 print("** attribute name missing **")
-                return
-            if len(arg) < 4:
+            elif len(arg) < 4:
                 print("** value missing **")
-                return
             else:
+                obj_exist = False
                 for obj in storage.all().values():
                     if arg[1] == obj.id:
                         obj_exist = True
+                        print("obj exist")
+                        break
                 if obj_exist:
                     const_attr = ["id", "created_at", "updated_at"]
                     if arg[2] not in const_attr:
-                        all_obj = storage.all()
-                        for obj_key, obj in all_obj.items():
-                            key = "{}.{}".format(arg[0], arg[1])
-                            if key == obj_key:
-                                attr = arg[2]
-                                attr_type = type(arg[2])
-                                attr_val = arg[3].strip('"').strip("'")
-                                setattr(obj, attr, attr_type(attr_val))
-                                obj.save()
+                        attr = arg[2]
+                        attr_type = type(arg[2])
+                        attr_val = arg[3].strip('"').strip("'")
+                        setattr(obj, attr, attr_type(attr_val))
+                        obj.save()
                 else:
                     print("** no instance found **")
         else:
