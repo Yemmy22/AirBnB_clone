@@ -134,35 +134,34 @@ class HBNBCommand(cmd.Cmd):
             arg = line.split(' ')
             if arg[0] not in self.class_list:
                 print("** class doesn't exist **")
+                return
+            if len(arg) < 2:
+                print("** instance id missing **")
+                return
+            if len(arg) < 3:
+                print("** attribute name missing **")
+                return
+            if len(arg) < 4:
+                print("** value missing **")
+                return
             else:
-                if len(arg) < 2:
-                    print("** instance id missing **")
+                for obj in storage.all().values():
+                    if arg[1] == obj.id:
+                        obj_exist = True
+                if obj_exist:
+                    const_attr = ["id", "created_at", "updated_at"]
+                    if arg[2] not in const_attr:
+                        all_obj = storage.all()
+                        for obj_key, obj in all_obj.items():
+                            key = "{}.{}".format(arg[0], arg[1])
+                            if key == obj_key:
+                                attr = arg[2]
+                                attr_type = type(arg[2])
+                                attr_val = arg[3].strip('"').strip("'")
+                                setattr(obj, attr, attr_type(attr_val))
+                                obj.save()
                 else:
-                    obj_copy = False
-                    for obj in storage.all().values():
-                        if arg[1] == obj.id:
-                            obj_copy = True
-                    if not obj_copy:
-                        print("** no instance found **")
-                    else:
-                        if len(arg) < 3:
-                            print("** attribute name missing **")
-                        elif len(arg) < 4:
-                            print("** value missing **")
-                        else:
-                            const_attr = ["id", "created_at", "updated_at"]
-                            if arg[2] not in const_attr:
-                                all_obj = storage.all()
-                                for obj_key, obj in all_obj.items():
-                                    key = "{}.{}".format(arg[0], arg[1])
-                                    if key == obj_key:
-                                        attr = arg[2]
-                                        attr_type = type(arg[2])
-                                        attr_val = arg[3].strip('"').strip("'")
-                                        setattr(obj, attr, attr_type(attr_val))
-                                        obj.save()
-                                        return
-                                    print("** no instance found **")
+                    print("** no instance found **")
         else:
             print("** class name missing **")
 
@@ -199,16 +198,41 @@ class HBNBCommand(cmd.Cmd):
             # Update a specified class instance.
 
             elif arg[0] in self.class_list and cmnd == "update":
-                data_1, data_2, data_3 = data.split()
-                obj_id = data_1.strip(',').strip('"')
-                attr_name = data_2.strip(',').strip('"')
-                attr_value = data_3.strip(')')
-                line = "update {} {} {} {}".format(
-                        arg[0],
-                        obj_id,
-                        attr_name,
-                        attr_value
-                        )
+                try:
+                    data_1, data_2, data_3 = data.split()
+                    obj_id = data_1.strip(',').strip('"')
+                    attr_name = data_2.strip(',').strip('"')
+                    attr_value = data_3.strip(')')
+                    line = "update {} {} {} {}".format(
+                            arg[0],
+                            obj_id,
+                            attr_name,
+                            attr_value
+                            )
+                except Exception:
+                    pass
+            # Usage: <class name>.update(<id>, <dictionary representation>)
+            # Update specified class instance with a dictionary
+                try:
+                    if arg[0] in self.class_list and cmnd == "update":
+                        id_part, dict_part = data.split(',', 1)
+                        obj_id = id_part.strip('"')
+                        obj_dict = dict_part.strip(' ').strip(')')
+                        dictionary = eval(obj_dict)
+                        cmd_list = []
+                        for key, value in dictionary.items():
+                            if type(value) == str:
+                                attr_name = key.strip('"')
+                                attr_value = value.strip('"')
+                            else:
+                                attr_name = key
+                                attr_value = value
+                            cmd_list.append("update {} {} {} {}".format(
+                                arg[0], obj_id, attr_name, attr_value))
+                        for line in cmd_list:
+                            self.onecmd(line)
+                except Exception:
+                    pass
         except Exception:
             pass
 
