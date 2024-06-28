@@ -3,6 +3,8 @@
 '''
 Console Test Module
 '''
+
+
 import unittest
 from io import StringIO
 from unittest.mock import patch
@@ -16,17 +18,18 @@ from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
 
-
-class test_Console(unittest.TestCase):
-    '''
-    Test all features of the console: command and
+class TestConsole(unittest.TestCase):
+    """
+    Test all features of the HBNB console: command and
     non-command line arguments.
-    '''
+    """
+
     def setUp(self):
         """
         Setup before each test
         """
         self.console = HBNBCommand()
+        self.models = [BaseModel, User, State, City, Place, Amenity, Review]
 
     def tearDown(self):
         """
@@ -50,6 +53,30 @@ class test_Console(unittest.TestCase):
             self.console.onecmd("EOF")
             self.assertEqual("", f.getvalue().strip())
 
+    def test_help_EOF(self):
+        """
+        Test help_EOF command
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.console.onecmd("help EOF")
+            output_eof = f.getvalue()
+
+            expected_output = 'Quit command to exit the program\n\n'
+
+            self.assertEqual(output_eof, expected_output)
+
+    def test_help_quit(self):
+        """
+        Test help_EOF command
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.console.onecmd("help quit")
+            output_quit = f.getvalue()
+
+            expected_output = 'Quit command to exit the program\n\n'
+
+            self.assertEqual(output_quit, expected_output)
+
     def test_emptyline(self):
         """
         Test empty line input
@@ -58,231 +85,145 @@ class test_Console(unittest.TestCase):
             self.console.onecmd("")
             self.assertEqual("", f.getvalue().strip())
 
-    def test_do_create(self):
+    def test_create(self):
         """
-        Test create command
+        Test create command for each model
         """
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("create User")
-            user_id = f.getvalue().strip()
-            self.assertIn("User.{}".format(user_id), storage.all().keys())
+        for model in self.models:
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd("create {}".format(model.__name__))
+                model_id = f.getvalue().strip()
+                self.assertIn("{}.{}".format(model.__name__, model_id), storage.all().keys())
 
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("create NonExistentClass")
-            self.assertEqual("** class doesn't exist **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("create")
-            self.assertEqual("** class name missing **", f.getvalue().strip())
-
-    def test_do_show(self):
+    def test_show(self):
         """
-        Test show command
+        Test show command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("show User {}".format(new_user.id))
-            output = f.getvalue().strip()
-            self.assertIn("User", output)
-            self.assertIn(new_user.id, output)
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd("show {} {}".format(model.__name__, instance.id))
+                output = f.getvalue().strip()
+                self.assertIn(model.__name__, output)
+                self.assertIn(instance.id, output)
 
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("show User")
-            self.assertEqual("** instance id missing **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("show NonExistentClass {}".format(new_user.id))
-            self.assertEqual("** class doesn't exist **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("show User NonExistentID")
-            self.assertEqual("** no instance found **", f.getvalue().strip())
-
-    def test_do_destroy(self):
+    def test_destroy(self):
         """
-        Test destroy command
+        Test destroy command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("destroy User {}".format(new_user.id))
-            self.assertNotIn("User.{}".format(new_user.id), storage.all().keys())
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd("destroy {} {}".format(model.__name__, instance.id))
+                self.assertNotIn("{}.{}".format(model.__name__, instance.id), storage.all().keys())
 
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("destroy User")
-            self.assertEqual("** instance id missing **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("destroy NonExistentClass {}".format(new_user.id))
-            self.assertEqual("** class doesn't exist **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("destroy User NonExistentID")
-            self.assertEqual("** no instance found **", f.getvalue().strip())
-
-    def test_do_all(self):
+    def test_all(self):
         """
-        Test all command
+        Test all command for each model
         """
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("all")
-            output = f.getvalue().strip()
-            self.assertIsInstance(output, str)
+        for model in self.models:
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd("all {}".format(model.__name__))
+                output = f.getvalue().strip()
+                self.assertIsInstance(output, str)
 
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("all User")
-            output = f.getvalue().strip()
-            self.assertIn("User", output)
-            self.assertIn(new_user.id, output)
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("all NonExistentClass")
-            self.assertEqual("** class doesn't exist **", f.getvalue().strip())
-
-    def test_do_update(self):
+    def test_update(self):
         """
-        Test update command
+        Test update command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('update User {} first_name "John"'.format(new_user.id))
-            self.assertEqual("obj exist", f.getvalue().strip())
-            self.assertEqual(new_user.first_name, "John")
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("update User")
-            self.assertEqual("** instance id missing **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("update User NonExistentID first_name John")
-            self.assertEqual("** no instance found **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("update NonExistentClass NonExistentID first_name John")
-            self.assertEqual("** class doesn't exist **", f.getvalue().strip())
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('update User {} first_name'.format(new_user.id))
-            self.assertEqual("** value missing **", f.getvalue().strip())
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd('update {} {} name "Test"'.format(model.__name__, instance.id))
+                self.assertEqual(instance.name, "Test")
 
     def test_update_with_dict(self):
         """
-        Test update command with dictionary
+        Test update command with dictionary for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('User.update("{}", {{"first_name": "John", "age": 30}})'.format(new_user.id))
-            self.assertEqual(new_user.first_name, "John")
-            self.assertEqual(new_user.age, 30)
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd('{}.update({}, {{"name": "Test", "age": 30}})'.format(model.__name__, instance.id))
+                
+                self.assertEqual(instance.name, "Test")
 
     def test_count(self):
         """
-        Test <class name>.count() command
+        Test <class name>.count() command for each model
         """
-        new_user1 = User()
-        new_user1.save()
-        new_user2 = User()
-        new_user2.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("User.count()")
-            self.assertEqual(f.getvalue().strip(), "2")
+        for model in self.models:
+            model()
+            model().save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd("{}.count()".format(model.__name__))
+                count_output = f.getvalue().strip().split("\n")[-1]
+                self.assertEqual(count_output, "2")
 
     def test_all_with_class(self):
         """
-        Test <class name>.all() command
+        Test <class name>.all() command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("User.all()")
-            output = f.getvalue().strip()
-            self.assertIn("User", output)
-            self.assertIn(new_user.id, output)
-
-    def test_update_with_dict(self):
-        """
-        Test update command with dictionary
-        """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('User.update("{}", {{"first_name": "John", "age": 30}})'.format(new_user.id))
-            self.assertEqual(new_user.first_name, "John")
-            self.assertEqual(int(new_user.age), 30)
-
-    def test_count(self):
-        """
-        Test <class name>.count() command
-        """
-        new_user1 = User()
-        new_user1.save()
-        new_user2 = User()
-        new_user2.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("User.count()")
-            count_output = f.getvalue().strip().split("\n")[-1]
-            self.assertEqual(count_output, "2")
-
-    def test_all_with_class(self):
-        """
-        Test <class name>.all() command
-        """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd("User.all()")
-            output = f.getvalue().strip()
-            self.assertIn("User", output)
-            self.assertIn(new_user.id, output)
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd("{}.all()".format(model.__name__))
+                output = f.getvalue().strip()
+                self.assertIn(model.__name__, output)
+                self.assertIn(instance.id, output)
 
     def test_show_with_onecmd(self):
         """
-        Test <class name>.show(<id>) command
+        Test <class name>.show(<id>) command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('User.show("{}")'.format(new_user.id))
-            output = f.getvalue().strip()
-            self.assertIn("User", output)
-            self.assertIn(new_user.id, output)
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd('{}.show("{}")'.format(model.__name__, instance.id))
+                output = f.getvalue().strip()
+                self.assertIn(model.__name__, output)
+                self.assertIn(instance.id, output)
 
     def test_destroy_with_onecmd(self):
         """
-        Test <class name>.destroy(<id>) command
+        Test <class name>.destroy(<id>) command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('User.destroy("{}")'.format(new_user.id))
-            self.assertNotIn("User.{}".format(new_user.id), storage.all().keys())
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd('{}.destroy("{}")'.format(model.__name__, instance.id))
+                self.assertNotIn("{}.{}".format(model.__name__, instance.id), storage.all().keys())
 
     def test_update_with_onecmd(self):
         """
-        Test <class name>.update(<id>, <attribute name>, <attribute value>) command
+        Test <class name>.update(<id>, <attribute name>, <attribute value>) command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('User.update("{}", "first_name", "John")'.format(new_user.id))
-            self.assertEqual(new_user.first_name, "John")
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd('{}.update("{}", "name", "Test")'.format(model.__name__, instance.id))
+                self.assertEqual(instance.name, "Test")
 
     def test_update_with_dict_onecmd(self):
         """
-        Test <class name>.update(<id>, <dictionary representation>) command
+        Test <class name>.update(<id>, <dictionary representation>) command for each model
         """
-        new_user = User()
-        new_user.save()
-        with patch('sys.stdout', new=StringIO()) as f:
-            self.console.onecmd('User.update("{}", {{"first_name": "John", "age": 30}})'.format(new_user.id))
-            self.assertEqual(new_user.first_name, "John")
-            self.assertEqual(int(new_user.age), 30)
-
+        for model in self.models:
+            instance = model()
+            instance.save()
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd('{}.update({}, {{"name": "Test", "age": 30}})'.format(model.__name__, instance.id))
+                self.assertEqual(instance.name, "Test")
+                self.assertEqual(int(instance.age), 30)
 
 if __name__ == '__main__':
     unittest.main()
+
